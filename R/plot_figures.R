@@ -28,7 +28,7 @@ plot_KMCurve <- function(clinical, labels, annot = NULL, color = NULL, font = "A
     } else {
       color <- RColorBrewer::brewer.pal(length(unique(na.omit(labels))), "Set1")
     }
-    color <- color[1:length(unique(labels))]
+    color <- color[1:length(unique(na.omit(labels)))]
   }
 
   p <- GGally::ggsurv(surv, surv.col = color, xlab = xlab, ylab = ylab) +
