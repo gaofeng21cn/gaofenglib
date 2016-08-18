@@ -42,3 +42,15 @@ plot_KMCurve <- function(clinical, labels, annot = NULL, color = NULL, font = "A
 
   p
 }
+
+#' Transform scientific notation to expression form
+fancy_scientific <- function(l, digits = 3) {
+  # turn in to character string in scientific notation
+  l <- format(l, scientific = TRUE, digits = digits)
+  # quote the part before the exponent to keep all the digits
+  l <- gsub("^(.*)e", "'\\1'e", l)
+  # turn the 'e+' into plotmath format
+  l <- gsub("e", "%*%10^", l)
+  # return this as an expression
+  parse(text=l)
+}
