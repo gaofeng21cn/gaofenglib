@@ -26,7 +26,7 @@ plot_KMCurve <- function(clinical, labels, annot = NULL, color = NULL, font = "A
     if(length(unique(labels)) < 3) {
       color <- RColorBrewer::brewer.pal(3, "Set1")
     } else {
-      color <- RColorBrewer::brewer.pal(length(unique(labels)), "Set1")
+      color <- RColorBrewer::brewer.pal(length(unique(na.omit(labels))), "Set1")
     }
     color <- color[1:length(unique(labels))]
   }
