@@ -26,9 +26,9 @@ plot_KMCurve <- function(clinical, labels, annot = NULL, color = NULL, font = "A
     if(length(unique(labels)) < 3) {
       color <- RColorBrewer::brewer.pal(3, "Set1")
     } else {
-      color <- RColorBrewer::brewer.pal(length(unique(labels)), "Set1")
+      color <- RColorBrewer::brewer.pal(length(unique(na.omit(labels))), "Set1")
     }
-    color <- color[1:length(unique(labels))]
+    color <- color[1:length(unique(na.omit(labels)))]
   }
 
   p <- GGally::ggsurv(surv, surv.col = color, xlab = xlab, ylab = ylab) +
@@ -41,4 +41,16 @@ plot_KMCurve <- function(clinical, labels, annot = NULL, color = NULL, font = "A
   if(!is.null(annot)) p <- p + annotate("text", x = 0, y = 0, label = annot, hjust = 0, vjust = 0)
 
   p
+}
+
+#' Transform scientific notation to expression form
+fancy_scientific <- function(l, digits = 3) {
+  # turn in to character string in scientific notation
+  l <- format(l, scientific = TRUE, digits = digits)
+  # quote the part before the exponent to keep all the digits
+  l <- gsub("^(.*)e", "'\\1'e", l)
+  # turn the 'e+' into plotmath format
+  l <- gsub("e", "%*%10^", l)
+  # return this as an expression
+  parse(text=l)
 }
