@@ -29,6 +29,11 @@ plot_KMCurve <- function(clinical, labels, annot = NULL, color = NULL, font = "A
       color <- RColorBrewer::brewer.pal(length(unique(na.omit(labels))), "Set1")
     }
     color <- color[1:length(unique(na.omit(labels)))]
+
+    if(class(labels) == "factor") {
+      names(color) <- levels(labels)
+    }
+    names(color) <- unique(na.omit(labels))
   }
 
   p <- GGally::ggsurv(surv, surv.col = color, xlab = xlab, ylab = ylab) +
