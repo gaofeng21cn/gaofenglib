@@ -32,8 +32,10 @@ plot_KMCurve <- function(clinical, labels, annot = NULL, color = NULL, font = "A
 
     if(class(labels) == "factor") {
       names(color) <- levels(labels)
+    } else {
+      names(color) <- unique(na.omit(labels))
     }
-    names(color) <- unique(na.omit(labels))
+
   }
 
   p <- GGally::ggsurv(surv, surv.col = color, xlab = xlab, ylab = ylab) +
