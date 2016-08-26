@@ -30,9 +30,19 @@ plot_KMCurve <- function(clinical, labels, annot = NULL, color = NULL, font = "A
     }
     color <- color[1:length(unique(na.omit(labels)))]
 
-    names(color) <-  ifelse(class(labels) == "factor", levels(labels), unique(na.omit(labels)))
+    if(class(labels) == "factor") {
+      names(color) <- levels(labels)
+    } else {
+      names(color) <- unique(na.omit(labels))
+    }
   }
-  if(!is.null(names(color))) color <- color[ifelse(class(labels) == "factor", levels(labels), unique(na.omit(labels)))]
+  if(!is.null(names(color))) {
+    if(class(labels) == "factor") {
+      color <- color[levels(labels)]
+    } else {
+      color <- color[unique(na.omit(labels))]
+    }
+  }
 
   p <- GGally::ggsurv(surv, surv.col = color, xlab = xlab, ylab = ylab) +
     annotate("text", family=font, x = Inf, y = Inf, label =
