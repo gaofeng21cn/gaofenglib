@@ -64,7 +64,7 @@ plot_KMCurve <- function(
   # p
 
   if(class(labels) == "factor") {
-    legend.labs <- levels(labels)
+    legend.labs <- droplevels(na.omit(levels(labels)))
   } else {
     legend.labs <- unique(na.omit(labels))
   }
