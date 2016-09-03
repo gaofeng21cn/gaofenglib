@@ -63,13 +63,13 @@ plot_KMCurve <- function(
   #
   # p
 
+  if(!is.null(color)) labels <- factor(labels, levels = names(color))
+
   if(class(labels) == "factor") {
-    legend.labs <- droplevels(na.omit(levels(labels)))
+    legend.labs <- na.omit(levels(droplevels(labels)))
   } else {
     legend.labs <- unique(na.omit(labels))
   }
-
-  if(!is.null(color)) labels <- factor(labels, levels = names(color))
 
 
   p <- survminer::ggsurvplot(surv, color = color, xlab = xlab, ylab = ylab,
