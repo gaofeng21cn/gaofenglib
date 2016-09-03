@@ -69,6 +69,8 @@ plot_KMCurve <- function(
     legend.labs <- unique(na.omit(labels))
   }
 
+  if(!is.null(color)) labels <- factor(labels, levels = names(color))
+
 
   p <- survminer::ggsurvplot(surv, color = color, xlab = xlab, ylab = ylab,
                              palette = "Set1",
