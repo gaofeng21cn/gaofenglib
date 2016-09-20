@@ -64,15 +64,15 @@ plot_KMCurve <- function(
   # p
 
   if(!is.null(color)) {
-    if(!is.null(names(color))) labels <- factor(labels, levels = names(color))
+    if(!is.null(names(color))) {
+      labels <- factor(labels, levels = names(color))
+      }
   } else {
       color <- "Set1"
     }
 
   if(class(labels) == "factor") {
     legend.labs <- na.omit(levels(droplevels(labels)))
-  } else {
-    legend.labs <- unique(na.omit(labels))
   }
 
 
