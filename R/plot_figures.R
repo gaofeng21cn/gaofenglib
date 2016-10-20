@@ -21,7 +21,7 @@
 plot_KMCurve <- function(
   clinical, labels, annot = NULL, color = NULL,
   font = "Arial", xlab = "Follow up (weeks)", ylab = "DFS (prob.)", legend.pos = "top",
-  risk.table = F)
+  risk.table = F, ...)
 {
   obj <-  clinical ~ labels
   surv <- survival::survfit(obj)
@@ -87,7 +87,7 @@ plot_KMCurve <- function(
                              risk.table = risk.table,
                              risk.table.title = NULL,
                              risk.table.y.text = FALSE,
-                             ggtheme = theme(text = element_text(family=font)))
+                             ggtheme = theme(text = element_text(family=font)), ...)
 
   p$plot <- p$plot +
     annotate("text", family=font, x = Inf, y = Inf, label =

@@ -5,7 +5,8 @@
 \title{Plot Kaplan-Meier Curve}
 \usage{
 plot_KMCurve(clinical, labels, annot = NULL, color = NULL, font = "Arial",
-  xlab = "Follow up (weeks)", ylab = "DFS (prob.)")
+  xlab = "Follow up (weeks)", ylab = "DFS (prob.)", legend.pos = "top",
+  risk.table = F, ...)
 }
 \arguments{
 \item{clinical}{a survival object created by Surv function in survival package}
@@ -21,6 +22,10 @@ plot_KMCurve(clinical, labels, annot = NULL, color = NULL, font = "Arial",
 \item{xlab}{a character indicating the label of x-axis (default: "Follow up (weeks)")}
 
 \item{ylab}{a character indicating the label of y-axis (default: "DFS (prob.)")}
+
+\item{risk.table}{a logical indicating whether show risk table or not (default: FALSE)}
+
+\item{lenged.pos}{a character indicating whether the legend is (default: "top")}
 }
 \value{
 a ggplot2 object of the plot
