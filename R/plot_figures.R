@@ -42,7 +42,7 @@ plot_KMCurve <- function (clinical, labels, annot = NULL, color = NULL, font = "
   else {
     legend.labs <- na.omit(unique(labels))
   }
-  p <- survminer::ggsurvplot(surv, xlab = xlab, ylab = ylab, break.time.by = period/5,
+  p <- survminer::ggsurvplot(surv, xlab = xlab, ylab = ylab, break.time.by = period,
                              palette = color, legend = legend.pos, legend.title = NULL,
                              legend.labs = legend.labs, risk.table = risk.table, risk.table.title = NULL,
                              risk.table.y.text = FALSE, ggtheme = theme(text = element_text(family = font)))
