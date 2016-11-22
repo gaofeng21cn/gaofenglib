@@ -6,7 +6,7 @@
 \usage{
 plot_KMCurve(clinical, labels, annot = NULL, color = NULL, font = "Arial",
   xlab = "Follow up (weeks)", ylab = "DFS (prob.)", legend.pos = "top",
-  risk.table = F, ...)
+  risk.table = F, period = NULL)
 }
 \arguments{
 \item{clinical}{a survival object created by Surv function in survival package}
