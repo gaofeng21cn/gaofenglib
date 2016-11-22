@@ -22,7 +22,7 @@ plot_KMCurve <- function (clinical, labels, annot = NULL, color = NULL, font = "
                           xlab = "Follow up (weeks)", ylab = "DFS (prob.)", legend.pos = "top",
                           risk.table = F, period = NULL)
 {
-  if(is.null(period)) period <- ifelse(max(clinical[,1]) > 2000, 500, ifelse(max(clinical[,1]) > 500, 100, 50))
+  if(is.null(period)) period <- ifelse(max(clinical[,1]) > 4000, 1000, ifelse(max(clinical[,1]) > 2000, 500, ifelse(max(clinical[,1]) > 500, 100, 50)))
   obj <- clinical ~ labels
   surv <- survival::survfit(obj)
   survstats <- survival::survdiff(obj)
