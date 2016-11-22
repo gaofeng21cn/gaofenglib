@@ -12,3 +12,4 @@ Imports: ggplot2, survminer
 Depends:
     cowplot
 RoxygenNote: 5.0.1
+lib

@@ -18,86 +18,43 @@
 #' clinical <- survival::Surv(t.rfs, e.rfs)
 #' color.cms <- c("#E69E00","#0070B0","#CA78A6", "#009C73")
 #' plot_KMCurve(clinical, labels, "GSE39582", color.cms)
-plot_KMCurve <- function(
-  clinical, labels, annot = NULL, color = NULL,
-  font = "Arial", xlab = "Follow up (weeks)", ylab = "DFS (prob.)", legend.pos = "top",
-  risk.table = F, ...)
+plot_KMCurve <- function (clinical, labels, annot = NULL, color = NULL, font = "Arial",
+                          xlab = "Follow up (weeks)", ylab = "DFS (prob.)", legend.pos = "top",
+                          risk.table = F, period = NULL)
 {
-  obj <-  clinical ~ labels
+  if(is.null(period)) period <- max(clinical[,1])
+  obj <- clinical ~ labels
   surv <- survival::survfit(obj)
   survstats <- survival::survdiff(obj)
-  survstats$p.value <- 1 - pchisq(survstats$chisq, length(survstats$n) - 1)
-
-  # if(is.null(color)) {
-  #   if(length(unique(labels)) < 3) {
-  #     color <- RColorBrewer::brewer.pal(3, "Set1")
-  #   } else {
-  #     color <- RColorBrewer::brewer.pal(length(unique(na.omit(labels))), "Set1")
-  #   }
-  #   color <- color[1:length(unique(na.omit(labels)))]
-  #
-  #   if(class(labels) == "factor") {
-  #     names(color) <- levels(labels)
-  #   } else {
-  #     names(color) <- unique(na.omit(labels))
-  #   }
-  # }
-  # if(!is.null(names(color))) {
-  #   if(class(labels) == "factor") {
-  #     color <- color[levels(labels)]
-  #   } else {
-  #     color <- color[unique(na.omit(labels))]
-  #   }
-  # }
-  #
-  # p <- GGally::ggsurv(surv, surv.col = color, xlab = xlab, ylab = ylab) +
-  #    annotate("text", family=font, x = Inf, y = Inf, label =
-  #   ifelse(survstats$p.value == 0, "italic(P)%~~%0", paste0("italic(P)==", fancy_scientific(survstats$p.value,3)))
-  #   , hjust = 1.2, vjust = 2,parse = TRUE) +
-  #
-  #   theme(text = element_text(family=font),
-  #         legend.title = element_blank())
-  #
-  # # annotate data set name
-  # if(!is.null(annot)) p <- p + annotate("text", x = 0, y = 0, label = annot, hjust = 0, vjust = 0)
-  #
-  # p
-
-  if(!is.null(color)) {
-    if(!is.null(names(color))) {
+  survstats$p.value <- 1 - pchisq(survstats$chisq, length(survstats$n) -
+                                    1)
+  if (!is.null(color)) {
+    if (!is.null(names(color))) {
       labels <- factor(labels, levels = names(color))
-      }
-  } else {
-      color <- "Set1"
     }
-
-
-  if(class(labels) == "factor") {
+  }
+  else {
+    color <- "Set1"
+  }
+  if (class(labels) == "factor") {
     legend.labs <- na.omit(levels(droplevels(labels)))
-  } else {
+  }
+  else {
     legend.labs <- na.omit(unique(labels))
   }
-
-
-  p <- survminer::ggsurvplot(surv, xlab = xlab, ylab = ylab,
-                             palette = color,
-                             legend = legend.pos,
-                             legend.title = NULL,
-                             legend.labs = legend.labs,
-                             risk.table = risk.table,
-                             risk.table.title = NULL,
-                             risk.table.y.text = FALSE,
-                             ggtheme = theme(text = element_text(family=font)), ...)
-
-  p$plot <- p$plot +
-    annotate("text", family=font, x = Inf, y = Inf, label =
-               ifelse(survstats$p.value == 0, "italic(P)%~~%0", paste0("italic(P)==", fancy_scientific(survstats$p.value,3)))
-             , hjust = 1.2, vjust = 2,parse = TRUE)
-
-  # annotate data set name
-  if(!is.null(annot)) p$plot <- p$plot + annotate("text", x = 0, y = 0, label = annot, hjust = 0, vjust = 0)
-
-  if (risk.table) return(p)
+  p <- survminer::ggsurvplot(surv, xlab = xlab, ylab = ylab, break.time.by = period/5,
+                             palette = color, legend = legend.pos, legend.title = NULL,
+                             legend.labs = legend.labs, risk.table = risk.table, risk.table.title = NULL,
+                             risk.table.y.text = FALSE, ggtheme = theme(text = element_text(family = font)))
+  p$plot <- p$plot + annotate("text", family = font, x = Inf,
+                              y = Inf, label = ifelse(survstats$p.value == 0, "italic(P)%~~%0",
+                                                      paste0("italic(P)==", fancy_scientific(survstats$p.value,
+                                                                                             3))), hjust = 1.2, vjust = 2, parse = TRUE)
+  if (!is.null(annot))
+    p$plot <- p$plot + annotate("text", x = 0, y = 0, label = annot,
+                                hjust = 0, vjust = 0)
+  if (risk.table)
+    return(p)
   else return(p$plot)
 }
 
