@@ -19,7 +19,7 @@
 #' color.cms <- c("#E69E00","#0070B0","#CA78A6", "#009C73")
 #' plot_KMCurve(clinical, labels, "GSE39582", color.cms)
 plot_KMCurve <- function (clinical, labels, annot = NULL, color = NULL, font = "Arial",
-                          xlab = "Follow up (weeks)", ylab = "DFS (prob.)", legend.pos = "top",
+                          xlab = "Follow up (weeks)", ylab = "DFS (prob.)", title = NULL, legend.pos = "top",
                           risk.table = F, period = NULL)
 {
   if(is.null(period)) period <- ifelse(max(clinical[,1]) > 4000, 1000, ifelse(max(clinical[,1]) > 2000, 500, ifelse(max(clinical[,1]) > 500, 100, 50)))
@@ -42,12 +42,12 @@ plot_KMCurve <- function (clinical, labels, annot = NULL, color = NULL, font = "
   else {
     legend.labs <- na.omit(unique(labels))
   }
-  p <- survminer::ggsurvplot(surv, xlab = xlab, ylab = ylab, break.time.by = period,
+  p <- survminer::ggsurvplot(surv, xlab = xlab, ylab = ylab, break.time.by = period, main = title,
                              palette = color, legend = legend.pos, legend.title = NULL,
                              legend.labs = legend.labs, risk.table = risk.table, risk.table.title = NULL,
                              risk.table.y.text = FALSE, ggtheme = theme(text = element_text(family = font)))
   p$plot <- p$plot + annotate("text", family = font, x = Inf,
-                              y = Inf, label = ifelse(survstats$p.value == 0, "italic(P)%~~%0",
+                              y = Inf, label = ifelse(survstats$p.value == 0, "italic(P)<1%*%10^{-22}",
                                                       paste0("italic(P)==", fancy_scientific(survstats$p.value,
                                                                                              3))), hjust = 1.2, vjust = 2, parse = TRUE)
   if (!is.null(annot))
