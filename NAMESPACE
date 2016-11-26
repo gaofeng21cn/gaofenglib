@@ -2,5 +2,7 @@
 
 export(extract_tcga_clinical)
 export(plot_KMCurve)
+export(plot_ROC)
 import(cowplot)
 import(ggplot2)
+import(precrec)

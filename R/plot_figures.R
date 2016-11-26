@@ -69,3 +69,18 @@ fancy_scientific <- function(l, digits = 3) {
   # return this as an expression
   parse(text=l)
 }
+
+#' @export
+#' @import ggplot2 cowplot precrec
+plot_ROC <-  function(scores, labels)
+{
+  sscurves <- precrec::evalmod(scores = scores, labels = labels)
+  roc <- precrec::auc(sscurves)[1,4]
+
+  if(auc(sscurves)$aucs[1] < 0.5) {
+    sscurves <- precrec::evalmod(scores = -scores, labels = labels)
+    roc <- precrec::auc(sscurves)[1,4]
+  }
+
+  autoplot(sscurves, curvetype = "ROC") + theme_cowplot() + theme(legend.position = "none") + annotate("text", x=0.7,y=0.1, label=paste0("AUC = ", round(roc, 3)), size=4)
+}
