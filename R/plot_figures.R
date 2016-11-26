@@ -82,5 +82,7 @@ plot_ROC <-  function(scores, labels)
     roc <- precrec::auc(sscurves)[1,4]
   }
 
-  autoplot(sscurves, curvetype = "ROC") + theme_cowplot() + theme(legend.position = "none") + annotate("text", x=0.7,y=0.1, label=paste0("AUC = ", round(roc, 3)), size=4)
+  autoplot(sscurves, curvetype = "ROC") + theme_cowplot() +
+    theme(legend.position = "none", text = element_text(family = "Arial")) +
+    annotate("text", x=0.7,y=0.1, label=paste0("AUC = ", round(roc, 3)), size=4)
 }
