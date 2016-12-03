@@ -22,7 +22,7 @@ plot_KMCurve <- function (clinical, labels, annot = NULL, color = NULL, font = "
                           xlab = "Follow up (weeks)", ylab = "DFS (prob.)", title = NULL, legend.pos = "top",
                           risk.table = F, period = NULL)
 {
-  if(is.null(period)) period <- ifelse(max(clinical[,1]) > 4000, 1000, ifelse(max(clinical[,1]) > 2000, 500, ifelse(max(clinical[,1]) > 500, 100, 50)))
+  if(is.null(period)) period <- as.numeric(as.character(factor(cut(max(clinical[,1]), c(0, 50, 200, 500, 2000, 4000, Inf)), labels=c(10, 30, 50, 100, 500, 1000))))
   obj <- clinical ~ labels
   surv <- survival::survfit(obj)
   survstats <- survival::survdiff(obj)
@@ -41,6 +41,7 @@ plot_KMCurve <- function (clinical, labels, annot = NULL, color = NULL, font = "
   }
   else {
     legend.labs <- na.omit(unique(labels))
+    labels <- factor(labels, levels = legend.labs)
   }
   p <- survminer::ggsurvplot(surv, xlab = xlab, ylab = ylab, break.time.by = period, main = title,
                              palette = color, legend = legend.pos, legend.title = NULL,
@@ -85,4 +86,23 @@ plot_ROC <-  function(scores, labels)
   autoplot(sscurves, curvetype = "ROC") + theme_cowplot() +
     theme(legend.position = "none", text = element_text(family = "Arial")) +
     annotate("text", x=0.7,y=0.1, label=paste0("AUC = ", round(roc, 3)), size=4)
+}
+
+#' @export
+#' @import ggplot2 cowplot
+plot_RiskScore <- function(rs, event) {
+  if(is.logical(event)) event <- factor(event, levels = c(T, F), labels = c("Dead/Recurrence", "Disease free"))
+
+  df <- data.frame(pt=names(rs), rs=rs, event=event)
+  df <- df %>% arrange(rs)
+  df$pt <- factor(df$pt, levels = as.character(df$pt))
+
+  ggplot(df, aes(pt, rs, fill=event)) + geom_bar(stat="identity", alpha=0.7) +
+    scale_fill_brewer(palette = "Set1") + ylab("Risk score") +
+    theme(axis.text.x=element_blank(),
+          axis.title.x = element_blank(),
+          axis.line.x = element_blank(),
+          axis.ticks.x = element_blank(),
+          legend.title = element_blank(),
+          legend.position = c(0.8,0.2), legend.key.width = unit(1, "cm"))
 }
