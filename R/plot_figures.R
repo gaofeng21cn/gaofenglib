@@ -20,9 +20,8 @@
 #' plot_KMCurve(clinical, labels, "GSE39582", color.cms)
 plot_KMCurve <- function (clinical, labels, annot = NULL, color = NULL, font = "Arial",
                           xlab = "Follow up (weeks)", ylab = "DFS (prob.)", title = NULL, legend.pos = "top",
-                          risk.table = F, period = NULL)
+                          risk.table = F, palette = "nature")
 {
-  if(is.null(period)) period <- as.numeric(as.character(factor(cut(max(clinical[,1]), c(0, 50, 200, 500, 2000, 4000, Inf)), labels=c(10, 30, 50, 100, 500, 1000))))
   obj <- clinical ~ labels
   surv <- survival::survfit(obj)
   survstats <- survival::survdiff(obj)
@@ -35,7 +34,10 @@ plot_KMCurve <- function (clinical, labels, annot = NULL, color = NULL, font = "
   }
   else {
     color <- "Set1"
+    if(palette == "nautre") color <- ggsci::pal_npg("nrc")(length(unique(labels)))
+    if(palette == "lancet") color <- ggsci::pal_lancet("lanonc")(length(unique(labels)))
   }
+
   if (class(labels) == "factor") {
     legend.labs <- na.omit(levels(droplevels(labels)))
   }
@@ -43,9 +45,9 @@ plot_KMCurve <- function (clinical, labels, annot = NULL, color = NULL, font = "
     legend.labs <- na.omit(unique(labels))
     labels <- factor(labels, levels = legend.labs)
   }
-  p <- survminer::ggsurvplot(surv, xlab = xlab, ylab = ylab, break.time.by = period, main = title,
+  p <- survminer::ggsurvplot(surv, xlab = xlab, ylab = ylab, main = title,
                              palette = color, legend = legend.pos, legend.title = NULL,
-                             legend.labs = legend.labs, risk.table = risk.table, risk.table.title = NULL,
+                             legend.labs = legend.labs, risk.table = risk.table, risk.table.title = element_blank(),
                              risk.table.y.text = FALSE, ggtheme = theme(text = element_text(family = font)))
   p$plot <- p$plot + annotate("text", family = font, x = Inf,
                               y = Inf, label = ifelse(survstats$p.value == 0, "italic(P)<1%*%10^{-22}",
@@ -54,8 +56,11 @@ plot_KMCurve <- function (clinical, labels, annot = NULL, color = NULL, font = "
   if (!is.null(annot))
     p$plot <- p$plot + annotate("text", x = 0, y = 0, label = annot,
                                 hjust = 0, vjust = 0)
-  if (risk.table)
+  if (risk.table) {
+    p$table <- p$table + theme(axis.title.y = element_blank())
     return(p)
+  }
+
   else return(p$plot)
 }
 
