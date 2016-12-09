@@ -31,17 +31,15 @@ plot_KMCurve <- function (clinical, labels, annot = NULL, color = NULL, font = "
     if (!is.null(names(color))) {
       labels <- factor(labels, levels = names(color))
     }
-  }
-  else {
+  } else {
     color <- "Set1"
-    if(palette == "nautre") color <- ggsci::pal_npg("nrc")(length(unique(labels)))
+    if(palette == "nature") color <- ggsci::pal_npg("nrc")(length(unique(labels)))
     if(palette == "lancet") color <- ggsci::pal_lancet("lanonc")(length(unique(labels)))
   }
 
   if (class(labels) == "factor") {
     legend.labs <- na.omit(levels(droplevels(labels)))
-  }
-  else {
+  } else {
     legend.labs <- na.omit(unique(labels))
     labels <- factor(labels, levels = legend.labs)
   }
@@ -59,9 +57,7 @@ plot_KMCurve <- function (clinical, labels, annot = NULL, color = NULL, font = "
   if (risk.table) {
     p$table <- p$table + theme(axis.title.y = element_blank())
     return(p)
-  }
-
-  else return(p$plot)
+  } else return(p$plot)
 }
 
 #' Transform scientific notation to expression form
