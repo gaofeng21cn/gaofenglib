@@ -9,4 +9,3 @@ fancy_scientific(l, digits = 3)
 \description{
 Transform scientific notation to expression form
 }
-

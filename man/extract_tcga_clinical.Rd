@@ -9,4 +9,3 @@ extract_tcga_clinical(clin)
 \description{
 Extract clinical information from tcga format
 }
-

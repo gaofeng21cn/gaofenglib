@@ -77,17 +77,18 @@ fancy_scientific <- function(l, digits = 3) {
 plot_ROC <-  function(scores, labels)
 {
   sscurves <- precrec::evalmod(scores = scores, labels = labels)
-  roc <- precrec::auc(sscurves)[1,4]
-
-  if(auc(sscurves)$aucs[1] < 0.5) {
+  roc <- precrec::auc(sscurves)[1, 4]
+  if (auc(sscurves)$aucs[1] < 0.5) {
     sscurves <- precrec::evalmod(scores = -scores, labels = labels)
-    roc <- precrec::auc(sscurves)[1,4]
+    roc <- precrec::auc(sscurves)[1, 4]
   }
-
-  autoplot(sscurves, curvetype = "ROC") + theme_cowplot() +
+  autoplot(sscurves, curvetype = "ROC") + cowplot::theme_cowplot() +
     theme(legend.position = "none", text = element_text(family = "Arial")) +
-    annotate("text", x=0.7,y=0.1, label=paste0("AUC = ", round(roc, 3)), size=4)
+    annotate("text", x = 0.2, y = 0.8, label = paste0("AUC, ", round(roc, 3)), size = 4) +
+    ggsci::scale_color_npg() + xlab("False Positive") + ylab("True Positive") +   scale_y_continuous(labels=percent) + scale_x_continuous(labels=percent)
 }
+
+
 
 #' @export
 #' @import ggplot2 cowplot
@@ -107,3 +108,6 @@ plot_RiskScore <- function(rs, event) {
           legend.title = element_blank(),
           legend.position = c(0.8,0.2), legend.key.width = unit(1, "cm"))
 }
+
+
+

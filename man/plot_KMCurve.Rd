@@ -38,4 +38,3 @@ clinical <- survival::Surv(t.rfs, e.rfs)
 color.cms <- c("#E69E00","#0070B0","#CA78A6", "#009C73")
 plot_KMCurve(clinical, labels, "GSE39582", color.cms)
 }
-
