@@ -74,7 +74,7 @@ fancy_scientific <- function(l, digits = 3) {
 
 #' @export
 #' @import ggplot2 cowplot precrec
-plot_ROC <-  function(scores, labels)
+plot_ROC <-  function(scores, labels, fontsize=18)
 {
   sscurves <- precrec::evalmod(scores = scores, labels = labels)
   roc <- precrec::auc(sscurves)[1, 4]
@@ -82,9 +82,9 @@ plot_ROC <-  function(scores, labels)
     sscurves <- precrec::evalmod(scores = -scores, labels = labels)
     roc <- precrec::auc(sscurves)[1, 4]
   }
-  autoplot(sscurves, curvetype = "ROC") + cowplot::theme_cowplot() +
+  autoplot(sscurves, curvetype = "ROC") + cowplot::theme_cowplot(font_size = fontsize, font_family = "Arial", line_size = 1) +
     theme(legend.position = "none", text = element_text(family = "Arial")) +
-    annotate("text", x = 0.2, y = 0.8, label = paste0("AUC, ", round(roc, 3)), size = 4) +
+    annotate("text", x = 0.7, y = 0.1, label = paste0("AUC, ", round(roc, 3)), size=fontsize/3) +
     ggsci::scale_color_npg() + xlab("False Positive") + ylab("True Positive") +   scale_y_continuous(labels=percent) + scale_x_continuous(labels=percent)
 }
 
@@ -92,7 +92,7 @@ plot_ROC <-  function(scores, labels)
 
 #' @export
 #' @import ggplot2 cowplot
-plot_RiskScore <- function(rs, event) {
+plot_RiskScore <- function(rs, event, fontsize = 18) {
   if(is.logical(event)) event <- factor(event, levels = c(T, F), labels = c("Dead/Recurrence", "Disease free"))
 
   df <- data.frame(pt=names(rs), rs=rs, event=event)
@@ -100,13 +100,14 @@ plot_RiskScore <- function(rs, event) {
   df$pt <- factor(df$pt, levels = as.character(df$pt))
 
   ggplot(df, aes(pt, rs, fill=event)) + geom_bar(stat="identity", alpha=0.7) +
+    cowplot::theme_cowplot(font_size = fontsize, font_family = "Arial", line_size = 1) +
     scale_fill_brewer(palette = "Set1") + ylab("Risk score") +
     theme(axis.text.x=element_blank(),
           axis.title.x = element_blank(),
           axis.line.x = element_blank(),
           axis.ticks.x = element_blank(),
           legend.title = element_blank(),
-          legend.position = c(0.8,0.2), legend.key.width = unit(1, "cm"))
+          legend.position = c(0.2, 0.8), legend.key.width = unit(1, "cm"))
 }
 
 
