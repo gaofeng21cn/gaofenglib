@@ -35,6 +35,7 @@ plot_KMCurve <- function (clinical, labels, annot = NULL, color = NULL, font = "
     color <- "Set1"
     if(palette == "nature") color <- ggsci::pal_npg("nrc")(length(unique(labels)))
     if(palette == "lancet") color <- ggsci::pal_lancet("lanonc")(length(unique(labels)))
+    if(palette == "jco") color <- ggsci::pal_jco("default")(length(unique(labels)))
   }
 
   if (class(labels) == "factor") {
@@ -74,7 +75,7 @@ fancy_scientific <- function(l, digits = 3) {
 
 #' @export
 #' @import ggplot2 cowplot precrec
-plot_ROC <-  function(scores, labels, fontsize=18)
+plot_ROC <-  function(scores, labels, fontsize=18, palette = "nature")
 {
   sscurves <- precrec::evalmod(scores = scores, labels = labels)
   roc <- precrec::auc(sscurves)[1, 4]
@@ -82,10 +83,17 @@ plot_ROC <-  function(scores, labels, fontsize=18)
     sscurves <- precrec::evalmod(scores = -scores, labels = labels)
     roc <- precrec::auc(sscurves)[1, 4]
   }
-  autoplot(sscurves, curvetype = "ROC") + cowplot::theme_cowplot(font_size = fontsize, font_family = "Arial", line_size = 1) +
-    theme(legend.position = "none", text = element_text(family = "Arial")) +
+  p <- autoplot(sscurves, curvetype = "ROC") + cowplot::theme_cowplot(font_size = fontsize, font_family = "Arial", line_size = 1) +
+    theme(legend.position = "none") +
     annotate("text", x = 0.7, y = 0.1, label = paste0("AUC, ", round(roc, 3)), size=fontsize/3) +
-    ggsci::scale_color_npg() + xlab("False Positive") + ylab("True Positive") +   scale_y_continuous(labels=percent) + scale_x_continuous(labels=percent)
+    xlab("False Positive") + ylab("True Positive") +   scale_y_continuous(labels=percent) + scale_x_continuous(labels=percent)
+  switch(palette,
+         "jco"= {
+           p + ggsci::scale_color_jco()
+         },
+         "lancet"= {
+           p + ggsci::scale_color_lancet()
+         }, p + ggsci::scale_color_npg() )
 }
 
 
