@@ -104,7 +104,7 @@ plot_ROC <-  function(scores, labels, fontsize=18, palette = "nature")
 
 #' @export
 #' @import ggplot2 cowplot
-plot_RiskScore <- function(rs, event, fontsize = 18) {
+plot_RiskScore <- function(rs, event, fontsize = 16) {
   if(is.logical(event)) event <- factor(event, levels = c(T, F), labels = c("Dead/Recurrence", "Disease free"))
 
   df <- data.frame(pt=names(rs), rs=rs, event=event)
@@ -112,7 +112,7 @@ plot_RiskScore <- function(rs, event, fontsize = 18) {
   df$pt <- factor(df$pt, levels = as.character(df$pt))
 
   ggplot(df, aes(pt, rs, fill=event)) + geom_bar(stat="identity", alpha=0.7) +
-    cowplot::theme_cowplot(font_size = fontsize, font_family = "Arial", line_size = 1) +
+    cowplot::theme_cowplot(font_size = fontsize, font_family = "Arial") +
     scale_fill_brewer(palette = "Set1") + ylab("Risk score") +
     theme(axis.text.x=element_blank(),
           axis.title.x = element_blank(),
