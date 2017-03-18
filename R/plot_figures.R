@@ -86,11 +86,11 @@ plot_ROC <-  function(scores, labels, fontsize=18, palette = "nature")
   }
   p <- autoplot(sscurves, curvetype = "ROC") + cowplot::theme_cowplot(font_size = fontsize, font_family = "Arial", line_size = 1) +
     theme(legend.position = "none") +
-    annotate("text", x = 0.7, y = 0.1, label = paste0("AUC, ", format(round(roc, 3), nsmall =3)), size=fontsize/3) +
-    xlab("False Positive") + ylab("True Positive") +   scale_y_continuous(labels=percent) + scale_x_continuous(labels=percent)
+    annotate("text", x = 0.7, y = 0.1, label = paste0("AUC, ", format(round(roc, 3), nsmall =3)), size=fontsize/3)
   switch(palette,
          "jco"= {
-           p + ggsci::scale_color_jco()
+           p + ggsci::scale_color_jco() +
+            xlab("False Positive") + ylab("True Positive") +   scale_y_continuous(labels=percent) + scale_x_continuous(labels=percent)
          },
          "lancet"= {
            p + ggsci::scale_color_lancet()
@@ -122,5 +122,21 @@ plot_RiskScore <- function(rs, event, fontsize = 18) {
           legend.position = c(0.2, 0.8), legend.key.width = unit(1, "cm"))
 }
 
+#' @export
+#' @import ggplot2 cowplot
+plot_Boxplot <- function(value, label, palette = "nature", fontsize = 18) {
+  p <- qplot(x= label, y= value, geom= "boxplot", color= label) + cowplot::theme_cowplot(font_size = fontsize, font_family = "Arial", line_size = 1) + theme(legend.position = "none", axis.title = element_blank())
 
+  switch(palette,
+         "jco"= {
+           p + ggsci::scale_color_jco() +
+             xlab("False Positive") + ylab("True Positive") +   scale_y_continuous(labels=percent) + scale_x_continuous(labels=percent)
+         },
+         "lancet"= {
+           p + ggsci::scale_color_lancet()
+         },
+         "jama"= {
+           p + scale_color_manual(values = c("#5C7C86", "#10B4F3", "#FAA935"))
+         }, p + ggsci::scale_color_npg() )
+}
 
