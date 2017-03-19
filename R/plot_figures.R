@@ -36,7 +36,7 @@ plot_KMCurve <- function (clinical, labels, annot = NULL, color = NULL, font = "
     if(palette == "nature") color <- ggsci::pal_npg("nrc")(length(unique(labels)))
     if(palette == "lancet") color <- ggsci::pal_lancet("lanonc")(length(unique(labels)))
     if(palette == "jco") color <- ggsci::pal_jco("default")(length(unique(labels)))
-    if(palette == "jama") color <- c("#5C7C86", "#10B4F3", "#FAA935")[1:length(unique(labels))]
+    if(palette == "jama") color <- c("#164870", "#10B4F3", "#FAA935", "#2D292A", "#87AAB9", "#CAC27E", "#818282")[1:length(unique(labels))]
   }
 
   if (class(labels) == "factor") {
@@ -96,7 +96,7 @@ plot_ROC <-  function(scores, labels, fontsize=18, palette = "nature")
            p + ggsci::scale_color_lancet()
          },
          "jama"= {
-           p + scale_color_manual(values = c("#5C7C86", "#10B4F3", "#FAA935"))
+           p + scale_color_manual(values = c("#164870", "#10B4F3", "#FAA935", "#2D292A", "#87AAB9", "#CAC27E", "#818282"))
          }, p + ggsci::scale_color_npg() )
 }
 
@@ -136,7 +136,28 @@ plot_Boxplot <- function(value, label, palette = "nature", fontsize = 18) {
            p + ggsci::scale_color_lancet()
          },
          "jama"= {
-           p + scale_color_manual(values = c("#5C7C86", "#10B4F3", "#FAA935"))
+           p + scale_color_manual(values = c("#164870", "#10B4F3", "#FAA935", "#2D292A", "#87AAB9", "#CAC27E", "#818282"))
          }, p + ggsci::scale_color_npg() )
 }
 
+#' @export
+#' @import ggplot2 cowplot precrec
+plot_multiROC <- function(scores, groups, fontsize=16, palette="nature") {
+  msmdat1 <- precrec::mmdata(scores , groups, modnames = colnames(scores))
+  mmcurves <- precrec::evalmod(msmdat1)
+
+  p <- autoplot(mmcurves, "ROC")+ cowplot::theme_cowplot(font_size = fontsize, font_family = "Arial", line_size = 1)  +
+    theme(legend.position = c(0.8, 0.2),
+          legend.title = element_blank())
+  switch(palette,
+         "jco"= {
+           p + ggsci::scale_color_jco() +
+             xlab("False Positive") + ylab("True Positive") +   scale_y_continuous(labels=percent) + scale_x_continuous(labels=percent)
+         },
+         "lancet"= {
+           p + ggsci::scale_color_lancet()
+         },
+         "jama"= {
+           p + scale_color_manual(values = c("#164870", "#10B4F3", "#FAA935", "#2D292A", "#87AAB9", "#CAC27E", "#818282"))
+         }, p + ggsci::scale_color_npg() )
+}
