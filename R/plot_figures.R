@@ -129,8 +129,7 @@ plot_Boxplot <- function(value, label, palette = "nature", fontsize = 18) {
 
   switch(palette,
          "jco"= {
-           p + ggsci::scale_color_jco() +
-             xlab("False Positive") + ylab("True Positive") +   scale_y_continuous(labels=percent) + scale_x_continuous(labels=percent)
+           p + ggsci::scale_color_jco()
          },
          "lancet"= {
            p + ggsci::scale_color_lancet()
