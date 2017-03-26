@@ -104,7 +104,7 @@ plot_ROC <-  function(scores, labels, fontsize=18, palette = "nature")
 
 #' @export
 #' @import ggplot2 cowplot
-plot_RiskScore <- function(rs, event, fontsize = 16, palette = "nature") {
+plot_RiskScore <- function(rs, event, fontsize = 16, legend.position = c(0.2, 0.8), palette = "nature") {
   if(is.logical(event)) event <- factor(event, levels = c(T, F), labels = c("Dead/Recurrence", "Disease free"))
 
   df <- data.frame(pt=names(rs), rs=rs, event=event)
@@ -119,7 +119,7 @@ plot_RiskScore <- function(rs, event, fontsize = 16, palette = "nature") {
           axis.line.x = element_blank(),
           axis.ticks.x = element_blank(),
           legend.title = element_blank(),
-          legend.position = c(0.2, 0.8), legend.key.width = unit(1, "cm"))
+          legend.position = legend.position, legend.key.width = unit(1, "cm"))
 
   switch(palette, jco = {
     p + ggsci::scale_fill_jco()
