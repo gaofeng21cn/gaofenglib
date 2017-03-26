@@ -104,22 +104,34 @@ plot_ROC <-  function(scores, labels, fontsize=18, palette = "nature")
 
 #' @export
 #' @import ggplot2 cowplot
-plot_RiskScore <- function(rs, event, fontsize = 16) {
+plot_RiskScore <- function(rs, event, fontsize = 16, palette = "nature") {
   if(is.logical(event)) event <- factor(event, levels = c(T, F), labels = c("Dead/Recurrence", "Disease free"))
 
   df <- data.frame(pt=names(rs), rs=rs, event=event)
   df <- df %>% arrange(rs)
   df$pt <- factor(df$pt, levels = as.character(df$pt))
 
-  ggplot(df, aes(pt, rs, fill=event)) + geom_bar(stat="identity", alpha=0.7) +
+  p <- ggplot(df, aes(pt, rs, fill=event)) + geom_bar(stat="identity", alpha=0.7) +
     cowplot::theme_cowplot(font_size = fontsize, font_family = "Arial") +
-    scale_fill_brewer(palette = "Set1") + ylab("Risk score") +
+    ylab("Risk score") +
     theme(axis.text.x=element_blank(),
           axis.title.x = element_blank(),
           axis.line.x = element_blank(),
           axis.ticks.x = element_blank(),
           legend.title = element_blank(),
           legend.position = c(0.2, 0.8), legend.key.width = unit(1, "cm"))
+
+  switch(palette, jco = {
+    p + ggsci::scale_fill_jco()
+  }, lancet = {
+    p + ggsci::scale_fill_lancet()
+  }, jama = {
+    p + scale_fill_manual(values = c("#164870", "#10B4F3",
+                                     "#FAA935", "#2D292A", "#87AAB9", "#CAC27E", "#818282"))
+  }, lancet = {
+    p + ggsci::scale_fill_npg()
+  },
+  p + scale_fill_brewer(palette = "Set1"))
 }
 
 #' @export
