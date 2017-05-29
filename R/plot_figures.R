@@ -18,61 +18,106 @@
 #' clinical <- survival::Surv(t.rfs, e.rfs)
 #' color.cms <- c("#E69E00","#0070B0","#CA78A6", "#009C73")
 #' plot_KMCurve(clinical, labels, "GSE39582", color.cms)
-plot_KMCurve <- function (clinical, labels, annot = NULL, color = NULL, font = "Arial",
-                          xlab = "Follow up (weeks)", ylab = "DFS (prob.)", title = NULL, legend.pos = "top",
-                          risk.table = F, palette = "nature")
+plot_KMCurve <- function (clinical, labels, limit = NULL, annot = NULL, color = NULL, font = "Arial",
+                          xlab = "Follow up (weeks)", ylab = "DFS (prob.)", title = NULL,
+                          legend.pos = "top", risk.table = F, palette = "nature")
 {
+  if(!is.null(limit)) {
+    clinical[clinical[, 1] > limit, 2] <- F
+    clinical[clinical[, 1] > limit, 1] <- limit
+  }
+
   obj <- clinical ~ labels
   surv <- survival::survfit(obj)
   survstats <- survival::survdiff(obj)
   survstats$p.value <- 1 - pchisq(survstats$chisq, length(survstats$n) -
                                     1)
+
   if (!is.null(color)) {
     if (!is.null(names(color))) {
       labels <- factor(labels, levels = names(color))
     }
-  } else {
-    color <- "Set1"
-    if(palette == "nature") color <- ggsci::pal_npg("nrc")(length(unique(labels)))
-    if(palette == "lancet") color <- ggsci::pal_lancet("lanonc")(length(unique(labels)))
-    if(palette == "jco") color <- ggsci::pal_jco("default")(length(unique(labels)))
-    if(palette == "jama") color <- c("#164870", "#10B4F3", "#FAA935", "#2D292A", "#87AAB9", "#CAC27E", "#818282")[1:length(unique(labels))]
   }
-
+  else {
+    color <- "Set1"
+    if (palette == "nature")
+      color <- (ggsci::pal_npg("nrc"))(length(unique(labels)))
+    if (palette == "lancet")
+      color <- (ggsci::pal_lancet("lanonc"))(length(unique(labels)))
+    if (palette == "jco")
+      color <- (ggsci::pal_jco("default"))(length(unique(labels)))
+    if (palette == "jama")
+      color <- c("#164870", "#10B4F3", "#FAA935", "#2D292A",
+                 "#87AAB9", "#CAC27E", "#818282")[1:length(unique(labels))]
+    if (palette == "jama_raju")
+      color <- c("#3676BB", "#DDBB1B", "#858585", "#606060")[1:length(unique(labels))]
+  }
   if (class(labels) == "factor") {
     legend.labs <- na.omit(levels(droplevels(labels)))
-  } else {
+  }
+  else if (class(labels) == "logical") {
+    labels <- factor(labels, levels = c(F, T))
+    legend.labs <- na.omit(levels(droplevels(labels)))
+  }
+  else {
     legend.labs <- na.omit(unique(labels))
     labels <- factor(labels, levels = legend.labs)
   }
-  p <- survminer::ggsurvplot(surv, xlab = xlab, ylab = ylab, main = title,
-                             palette = color, legend = legend.pos, legend.title = NULL,
-                             legend.labs = legend.labs, risk.table = risk.table, risk.table.title = element_blank(),
-                             risk.table.y.text = FALSE, ggtheme = theme(text = element_text(family = font)))
-  p$plot <- p$plot + annotate("text", family = font, x = Inf,
-                              y = Inf, label = ifelse(survstats$p.value == 0, "italic(P)<1%*%10^{-22}",
-                                                      paste0("italic(P)==", fancy_scientific(survstats$p.value,
-                                                                                             3))), hjust = 1.2, vjust = 2, parse = TRUE)
+
+  fancy_scientific <- function(l, dig=3) {
+    # turn in to character string in scientific notation
+    l <- format(l, digits = dig, scientific = TRUE)
+    # quote the part before the exponent to keep all the digits
+    l <- gsub("^(.*)e", "'\\1'e", l)
+    # turn the 'e+' into plotmath format
+    l <- gsub("e", "%*%10^", l)
+    # return this as an expression
+    parse(text=l)
+  }
+
+  p <- survminer::ggsurvplot(surv, xlab = xlab, ylab = ylab,
+                             main = title, palette = color, legend = legend.pos,
+                             legend.title = NULL, legend.labs = legend.labs, risk.table = risk.table,
+                             risk.table.title = element_blank(), risk.table.y.text = FALSE,
+                             ggtheme = theme(text = element_text(family = font)))
+  p$plot <- p$plot + annotate("text", family = font, x = 0,
+                              y = 0, label = ifelse(survstats$p.value == 0, "italic(P)<1%*%10^{-22}",
+                                                    paste0("italic(P)==", fancy_scientific(survstats$p.value, 3))), hjust = 0, vjust = -2, parse = TRUE)
+
+
+  # HR
+  if(length(legend.labs) == 2) {
+    hr <- survcomp::hazard.ratio(labels[!is.na(clinical)], clinical[!is.na(clinical), 1], clinical[!is.na(clinical), 2])
+
+    p$plot <- p$plot + annotate("text", x = 0, y = 0,
+                                label = sprintf("HR = %3.2f (%3.2f - %3.2f)", hr$hazard.ratio, hr$lower, hr$upper),
+                                hjust = 0, vjust = -1, parse = F)
+  }
+
   if (!is.null(annot))
     p$plot <- p$plot + annotate("text", x = 0, y = 0, label = annot,
                                 hjust = 0, vjust = 0)
   if (risk.table) {
     p$table <- p$table + theme(axis.title.y = element_blank())
     return(p)
-  } else return(p$plot)
+  }
+  else return(p$plot)
 }
 
-#' Transform scientific notation to expression form
-fancy_scientific <- function(l, digits = 3) {
-  # turn in to character string in scientific notation
-  l <- format(l, scientific = TRUE, digits = digits)
-  # quote the part before the exponent to keep all the digits
-  l <- gsub("^(.*)e", "'\\1'e", l)
-  # turn the 'e+' into plotmath format
-  l <- gsub("e", "%*%10^", l)
-  # return this as an expression
-  parse(text=l)
+switch_fill_color <- function(p, palette) {
+  switch(palette, jco = {
+    p + ggsci::scale_fill_jco()
+  }, lancet = {
+    p + ggsci::scale_fill_lancet()
+  }, jama = {
+    p + scale_fill_manual(values = c("#164870", "#10B4F3",
+                                     "#FAA935", "#2D292A", "#87AAB9", "#CAC27E", "#818282"))
+  }, lancet = {
+    p + ggsci::scale_fill_npg()
+  },
+  p + scale_fill_brewer(palette = "Set1"))
 }
+
 
 #' @export
 #' @import ggplot2 cowplot precrec scales
@@ -91,6 +136,36 @@ plot_ROC <-  function(scores, labels, fontsize=18, palette = "nature")
          "jco"= {
            p + ggsci::scale_color_jco() +
             xlab("False Positive") + ylab("True Positive") +   scale_y_continuous(labels=percent) + scale_x_continuous(labels=percent)
+         },
+         "lancet"= {
+           p + ggsci::scale_color_lancet()
+         },
+         "jama"= {
+           p + scale_color_manual(values = c("#164870", "#10B4F3", "#FAA935", "#2D292A", "#87AAB9", "#CAC27E", "#818282"))
+         }, p + ggsci::scale_color_npg() )
+}
+
+#' @export
+#' @import ggplot2 cowplot precrec
+plot_multiROC <- function(scores, groups, fontsize=16, palette="nature") {
+  msmdat1 <- precrec::mmdata(scores , groups, modnames = colnames(scores))
+  mmcurves <- precrec::evalmod(msmdat1)
+
+  inds <- subset(precrec::auc(mmcurves), curvetypes=="ROC")$auc < 0.5
+
+  if(any(inds)) {
+    scores[, inds] <- -scores[, inds]
+    msmdat1 <- precrec::mmdata(scores , groups, modnames = colnames(scores))
+    mmcurves <- precrec::evalmod(msmdat1)
+  }
+
+  p <- autoplot(mmcurves, "ROC")+ cowplot::theme_cowplot(font_size = fontsize, font_family = "Arial", line_size = 1)  +
+    theme(legend.position = c(0.8, 0.2),
+          legend.title = element_blank())
+  switch(palette,
+         "jco"= {
+           p + ggsci::scale_color_jco() +
+             xlab("False Positive") + ylab("True Positive") +   scale_y_continuous(labels=percent) + scale_x_continuous(labels=percent)
          },
          "lancet"= {
            p + ggsci::scale_color_lancet()
@@ -151,24 +226,4 @@ plot_Boxplot <- function(value, label, palette = "nature", fontsize = 18) {
          }, p + ggsci::scale_color_npg() )
 }
 
-#' @export
-#' @import ggplot2 cowplot precrec
-plot_multiROC <- function(scores, groups, fontsize=16, palette="nature") {
-  msmdat1 <- precrec::mmdata(scores , groups, modnames = colnames(scores))
-  mmcurves <- precrec::evalmod(msmdat1)
 
-  p <- autoplot(mmcurves, "ROC")+ cowplot::theme_cowplot(font_size = fontsize, font_family = "Arial", line_size = 1)  +
-    theme(legend.position = c(0.8, 0.2),
-          legend.title = element_blank())
-  switch(palette,
-         "jco"= {
-           p + ggsci::scale_color_jco() +
-             xlab("False Positive") + ylab("True Positive") +   scale_y_continuous(labels=percent) + scale_x_continuous(labels=percent)
-         },
-         "lancet"= {
-           p + ggsci::scale_color_lancet()
-         },
-         "jama"= {
-           p + scale_color_manual(values = c("#164870", "#10B4F3", "#FAA935", "#2D292A", "#87AAB9", "#CAC27E", "#818282"))
-         }, p + ggsci::scale_color_npg() )
-}
