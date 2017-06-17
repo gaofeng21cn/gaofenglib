@@ -53,7 +53,7 @@ plot_KMCurve <- function (clinical, labels, limit = NULL, annot = NULL, color = 
       color <- c("#3676BB", "#DDBB1B", "#858585", "#606060")[1:length(unique(labels))]
   }
   if (class(labels) == "factor") {
-    legend.labs <- na.omit(levels(droplevels(labels)))
+    legend.labs <- na.omit(levels(droplevels(labels[!is.na(clinical)])))
   }
   else if (class(labels) == "logical") {
     labels <- factor(labels, levels = c(F, T))
@@ -103,6 +103,7 @@ plot_KMCurve <- function (clinical, labels, limit = NULL, annot = NULL, color = 
   }
   else return(p$plot)
 }
+
 
 switch_fill_color <- function(p, palette) {
   switch(palette, jco = {
