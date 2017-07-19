@@ -20,7 +20,7 @@
 #' plot_KMCurve(clinical, labels, "GSE39582", color.cms)
 plot_KMCurve <- function (clinical, labels, limit = NULL, annot = NULL, color = NULL, font = "Arial",
                           xlab = "Follow up (weeks)", ylab = "DFS (prob.)", title = NULL,
-                          legend.pos = "top", risk.table = F, palette = "nature")
+                          legend.pos = "top", risk.table = T, palette = "nature")
 {
   if(!is.null(limit)) {
     clinical[clinical[, 1] > limit, 2] <- F
@@ -76,11 +76,11 @@ plot_KMCurve <- function (clinical, labels, limit = NULL, annot = NULL, color = 
   }
 
   p <- survminer::ggsurvplot(surv, xlab = xlab, ylab = ylab,
-                             main = title, palette = color, legend = legend.pos,
+                             palette = color, legend = legend.pos,
                              legend.title = NULL, legend.labs = legend.labs, risk.table = risk.table,
                              risk.table.title = element_blank(), risk.table.y.text = FALSE,
                              ggtheme = theme(text = element_text(family = font)))
-  p$plot <- p$plot + annotate("text", family = font, x = 0,
+  p$plot <- p$plot + ggtitle(title) + annotate("text", family = font, x = 0,
                               y = 0, label = ifelse(survstats$p.value == 0, "italic(P)<1%*%10^{-22}",
                                                     paste0("italic(P)==", fancy_scientific(survstats$p.value, 3))), hjust = 0, vjust = -2, parse = TRUE)
 
@@ -99,7 +99,8 @@ plot_KMCurve <- function (clinical, labels, limit = NULL, annot = NULL, color = 
                                 hjust = 0, vjust = 0)
   if (risk.table) {
     p$table <- p$table + theme(axis.title.y = element_blank())
-    return(p)
+    pp <- plot_grid(plotlist = list(p$plot + theme(axis.title.x = element_blank()), p$table + labs(x=xlab)), labels = "", ncol = 1, align = "hv", rel_heights = c(2.5,1))
+    return(pp)
   }
   else return(p$plot)
 }
@@ -227,4 +228,15 @@ plot_Boxplot <- function(value, label, palette = "nature", fontsize = 18) {
          }, p + ggsci::scale_color_npg() )
 }
 
+#' @export
+#' @import ggfortify
+plot_PCA <- function(data, labs, title="Evaluate the batch effect between groups") {
+  library(ggfortify)
 
+  df <- data.frame(group=labs, data, check.names = T)
+
+  autoplot(prcomp(df[, -1]), data=df, colour="group") +
+    theme(legend.title=element_blank()) +
+    scale_color_brewer(palette = "Set1") +
+    ggtitle(title)
+}
