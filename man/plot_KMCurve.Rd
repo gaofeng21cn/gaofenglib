@@ -4,9 +4,9 @@
 \alias{plot_KMCurve}
 \title{Plot Kaplan-Meier Curve}
 \usage{
-plot_KMCurve(clinical, labels, annot = NULL, color = NULL, font = "Arial",
-  xlab = "Follow up (weeks)", ylab = "DFS (prob.)", title = NULL,
-  legend.pos = "top", risk.table = F, palette = "nature")
+plot_KMCurve(clinical, labels, limit = NULL, annot = NULL, color = NULL,
+  font = "Arial", xlab = "Follow up (weeks)", ylab = "DFS (prob.)",
+  title = NULL, legend.pos = "top", risk.table = T, palette = "nature")
 }
 \arguments{
 \item{clinical}{a survival object created by Surv function in survival package}

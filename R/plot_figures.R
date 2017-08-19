@@ -184,6 +184,7 @@ plot_multiROC <- function(scores, groups, fontsize=16, palette="nature") {
 plot_RiskScore <- function(rs, event, fontsize = 16, legend.position = c(0.2, 0.8), palette = "nature") {
   if(is.logical(event)) event <- factor(event, levels = c(T, F), labels = c("Dead/Recurrence", "Disease free"))
 
+  if(is.null(names(rs))) names(rs) <- 1:length(rs)
   df <- data.frame(pt=names(rs), rs=rs, event=event)
   df <- df %>% arrange(rs)
   df$pt <- factor(df$pt, levels = as.character(df$pt))
