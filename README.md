@@ -16,3 +16,6 @@ devtools::install_github("gaofeng21cn/gaofenglib")
 - `plot_Boxplot`
 - `plot_PCA`
 
+#### Templates
+- `Analysis report(html)`
+- `Analysis report(pdf)`
