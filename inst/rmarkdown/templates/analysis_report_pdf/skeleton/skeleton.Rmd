@@ -1,0 +1,38 @@
+---
+title: "Analysis report"
+author: "Feng, GAO"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    number_sections: yes
+header-includes: 
+- \usepackage{graphicx}
+- \usepackage{float}
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, warning = F, message = F, cache = F)
+library(reshape2)
+library(dplyr)
+library(data.table)
+library(gaofenglib)
+library(caret)
+
+library(extrafont)
+loadfonts()
+
+library(gaofenglib)
+library(caret)
+library(NMF)
+
+library(xtable)
+library(ggsci)
+library(pROC)
+
+```
+
+# Infomation
+
+- Aim: 
+- Data: 
+- Analysis: **Feng, GAO ([Dr. Xin WANG's Lab @ CityU HK](http://cityu-hk-compbio.com/))** 
+- Update date: `r Sys.Date()`
