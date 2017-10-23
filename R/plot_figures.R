@@ -27,9 +27,10 @@ plot_KMCurve <- function (clinical, labels, limit = NULL, annot = NULL, color = 
     clinical[clinical[, 1] > limit, 1] <- limit
   }
 
-  obj <- clinical ~ labels
-  surv <- survival::survfit(obj)
-  survstats <- survival::survdiff(obj)
+  df <- data.frame(futime=clinical[, 1], fustat=clinical[, 2], group=labels)
+  surv <- survival::survfit(survival::Surv(futime, fustat) ~ group, data = df)
+
+  survstats <- survival::survdiff(survival::Surv(futime, fustat) ~ group, data = df)
   survstats$p.value <- 1 - pchisq(survstats$chisq, length(survstats$n) -
                                     1)
 
@@ -81,8 +82,8 @@ plot_KMCurve <- function (clinical, labels, limit = NULL, annot = NULL, color = 
                              risk.table.title = element_blank(), risk.table.y.text = FALSE,
                              ggtheme = theme(text = element_text(family = font)))
   p$plot <- p$plot + ggtitle(title) + annotate("text", family = font, x = 0,
-                              y = 0, label = ifelse(survstats$p.value == 0, "italic(P)<1%*%10^{-22}",
-                                                    paste0("italic(P)==", fancy_scientific(survstats$p.value, 3))), hjust = 0, vjust = -2, parse = TRUE)
+                                               y = 0, label = ifelse(survstats$p.value == 0, "italic(P)<1%*%10^{-22}",
+                                                                     paste0("italic(P)==", fancy_scientific(survstats$p.value, 3))), hjust = 0, vjust = -2, parse = TRUE)
 
 
   # HR
@@ -104,6 +105,7 @@ plot_KMCurve <- function (clinical, labels, limit = NULL, annot = NULL, color = 
   }
   else return(p$plot)
 }
+
 
 
 switch_fill_color <- function(p, palette) {
