@@ -8,7 +8,8 @@ Description: Useful R functions for personal use.
 License: MIT
 Encoding: UTF-8
 LazyData: true
-Imports: ggplot2, survminer, ggsci, ggfortify, precrec
+Imports: ggplot2, ggsci, ggfortify, precrec
 Depends:
     cowplot, scales
+Remotes: kassambara/survminer
 RoxygenNote: 6.0.1
