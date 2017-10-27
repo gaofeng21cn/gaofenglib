@@ -18,16 +18,16 @@
 #' clinical <- survival::Surv(t.rfs, e.rfs)
 #' color.cms <- c("#E69E00","#0070B0","#CA78A6", "#009C73")
 #' plot_KMCurve(clinical, labels, "GSE39582", color.cms)
-plot_KMCurve <- function (clinical, labels, limit = NULL, annot = NULL, color = NULL, font = "Arial",
-                          xlab = "Follow up (weeks)", ylab = "DFS (prob.)", title = NULL,
-                          legend.pos = "top", risk.table = T, palette = "nature")
+plot_KMCurve <- function (time, event, labels, limit = NULL, annot = NULL, color = NULL, font = "Arial",
+                           xlab = "Follow up (weeks)", ylab = "DFS (prob.)", title = NULL,
+                           legend.pos = "top", risk.table = T, palette = "nature")
 {
   if(!is.null(limit)) {
     clinical[clinical[, 1] > limit, 2] <- F
     clinical[clinical[, 1] > limit, 1] <- limit
   }
 
-  df <- data.frame(futime=clinical[, 1], fustat=clinical[, 2], group=labels)
+  df <- data.frame(futime=time, fustat=event, group=labels)
   surv <- survival::survfit(survival::Surv(futime, fustat) ~ group, data = df)
 
   survstats <- survival::survdiff(survival::Surv(futime, fustat) ~ group, data = df)
