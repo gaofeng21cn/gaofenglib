@@ -23,8 +23,8 @@ plot_KMCurve <- function (time, event, labels, limit = NULL, annot = NULL, color
                            legend.pos = "top", risk.table = T, palette = "nature")
 {
   if(!is.null(limit)) {
-    clinical[clinical[, 1] > limit, 2] <- F
-    clinical[clinical[, 1] > limit, 1] <- limit
+    event[time > limit] <- F
+    time[time > limit] <- limit
   }
 
   df <- data.frame(futime=time, fustat=event, group=labels)
