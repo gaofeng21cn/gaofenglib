@@ -54,7 +54,7 @@ plot_KMCurve <- function (time, event, labels, limit = NULL, annot = NULL, color
       color <- c("#3676BB", "#DDBB1B", "#858585", "#606060")[1:length(unique(labels))]
   }
   if (class(labels) == "factor") {
-    legend.labs <- na.omit(levels(droplevels(labels[!is.na(clinical)])))
+    legend.labs <- na.omit(levels(droplevels(labels[!(is.na(time)|is.na(event))])))
   }
   else if (class(labels) == "logical") {
     labels <- factor(labels, levels = c(F, T))
@@ -88,7 +88,7 @@ plot_KMCurve <- function (time, event, labels, limit = NULL, annot = NULL, color
 
   # HR
   if(length(legend.labs) == 2) {
-    hr <- survcomp::hazard.ratio(labels[!(is.na(time)|is.na(time))], time[!(is.na(time)|is.na(time))], event[!(is.na(time)|is.na(time))])
+    hr <- survcomp::hazard.ratio(labels[!(is.na(time)|is.na(event))], time[!(is.na(time)|is.na(event))], event[!(is.na(time)|is.na(event))])
 
     p$plot <- p$plot + annotate("text", x = 0, y = 0,
                                 label = sprintf("HR = %3.2f (%3.2f - %3.2f)", hr$hazard.ratio, hr$lower, hr$upper),
