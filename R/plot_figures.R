@@ -4,6 +4,7 @@
 #'
 #' @param clinical a survival object created by Surv function in survival package
 #' @param labels a vector containing subtyping labels of patients
+#' @param limit a numeric indicating the time limit of this KM plot
 #' @param annot a character indicating the annotation showed up in the plot
 #' @param color a vector containing colors used for different subtypes
 #' @param font a character indicating the font used in the plot (default: "Arial")
@@ -18,10 +19,13 @@
 #' clinical <- survival::Surv(t.rfs, e.rfs)
 #' color.cms <- c("#E69E00","#0070B0","#CA78A6", "#009C73")
 #' plot_KMCurve(clinical, labels, "GSE39582", color.cms)
-plot_KMCurve <- function (time, event, labels, limit = NULL, annot = NULL, color = NULL, font = "Arial",
+plot_KMCurve <- function (clinical, labels, limit = NULL, annot = NULL, color = NULL, font = "Arial",
                            xlab = "Follow up (weeks)", ylab = "DFS (prob.)", title = NULL,
                            legend.pos = "top", risk.table = T, palette = "nature")
 {
+  time <- clinical[, 1]
+  event <- clinical[, 2] == 1
+
   if(!is.null(limit)) {
     event[time > limit] <- F
     time[time > limit] <- limit

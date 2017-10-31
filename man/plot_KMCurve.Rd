@@ -4,13 +4,16 @@
 \alias{plot_KMCurve}
 \title{Plot Kaplan-Meier Curve}
 \usage{
-plot_KMCurve(time, event, labels, limit = NULL, annot = NULL,
-  color = NULL, font = "Arial", xlab = "Follow up (weeks)",
-  ylab = "DFS (prob.)", title = NULL, legend.pos = "top",
-  risk.table = T, palette = "nature")
+plot_KMCurve(clinical, labels, limit = NULL, annot = NULL, color = NULL,
+  font = "Arial", xlab = "Follow up (weeks)", ylab = "DFS (prob.)",
+  title = NULL, legend.pos = "top", risk.table = T, palette = "nature")
 }
 \arguments{
+\item{clinical}{a survival object created by Surv function in survival package}
+
 \item{labels}{a vector containing subtyping labels of patients}
+
+\item{limit}{a numeric indicating the time limit of this KM plot}
 
 \item{annot}{a character indicating the annotation showed up in the plot}
 
@@ -23,8 +26,6 @@ plot_KMCurve(time, event, labels, limit = NULL, annot = NULL,
 \item{ylab}{a character indicating the label of y-axis (default: "DFS (prob.)")}
 
 \item{risk.table}{a logical indicating whether show risk table or not (default: FALSE)}
-
-\item{clinical}{a survival object created by Surv function in survival package}
 
 \item{lenged.pos}{a character indicating whether the legend is (default: "top")}
 }
