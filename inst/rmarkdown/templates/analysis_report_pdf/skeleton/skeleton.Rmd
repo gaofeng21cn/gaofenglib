@@ -17,17 +17,17 @@ library(data.table)
 library(gaofenglib)
 library(caret)
 
-library(extrafont)
-loadfonts()
-
+library(cowplot)
+library(gfplot)
 library(gaofenglib)
+extrafont::loadfonts()
+
 library(caret)
 library(NMF)
 
 library(xtable)
 library(ggsci)
 library(pROC)
-
 ```
 
 # Infomation

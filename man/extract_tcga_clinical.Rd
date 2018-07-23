@@ -4,7 +4,7 @@
 \alias{extract_tcga_clinical}
 \title{Extract clinical information from tcga format}
 \usage{
-extract_tcga_clinical(clin)
+extract_tcga_clinical(clin, ESAC = FALSE, STAD = FALSE)
 }
 \description{
 Extract clinical information from tcga format

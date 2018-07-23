@@ -12,14 +12,14 @@ library(reshape2)
 library(dplyr)
 library(data.table)
 
-library(DT)
-
+library(cowplot)
+library(gfplot)
 library(gaofenglib)
-library(caret)
-# library(pheatmap)
+extrafont::loadfonts()
 
-# library(xtable)
-# library(GEOquery)
+# option
+# library(caret)
+# library(DT)
 ```
 
 # Infomation
