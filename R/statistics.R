@@ -5,7 +5,7 @@ calc_logit <- function(value, label) {
 
   roc2 <- pROC::roc(label, value)
 
-  power.roc <- c(power.roc.test(roc2, alternative = "one.side"), NA, NA)
+  power.roc <- c(power.roc.test(roc2, alternative = "one.side")$power, NA, NA)
 
   auc <- pROC::ci(roc2)[c(2,1,3)]
   names(auc) <- c("auc", "95% ci(lo)", "95% ci(hi)")
