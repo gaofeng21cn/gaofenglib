@@ -25,3 +25,13 @@ calc_logit <- function(value, label) {
 
   df
 }
+
+#' @export
+#' @import survivalROC
+
+calc_cutoff_survivalroc <- function(rfs, rs, limit = 60) {
+  p <- survivalROC::survivalROC(Stime = rfs[, 1], status = rfs[, 2], marker = rs, predict.time = limit, method="KM")
+  idx <- with(p, which.min(1-TP+ FP))
+  rs_cut <- p$cut.values[idx]
+  rs_cut
+}
