@@ -8,7 +8,7 @@ Description: Useful R functions for personal use.
 License: MIT
 Encoding: UTF-8
 LazyData: true
-Imports: ggplot2, ggsci, ggfortify
+Imports: ggplot2, ggsci, ggfortify, pROC, survivalROC
 Depends:
     cowplot, scales, dplyr
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0
