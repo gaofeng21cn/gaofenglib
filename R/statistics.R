@@ -37,3 +37,29 @@ calc_cutoff_survivalroc <- function(rfs, rs, limit = 60) {
   rs_cut <- p$cut.values[idx]
   rs_cut
 }
+
+#' @export
+#' @import survcomp survival
+#'
+factor_analysis <- function(clin_factors, rfs) {
+  res_single <- sapply(1:ncol(clin_factors), function(i) {
+    idx <- !is.na(clin_factors[, i]) & !is.na(rfs)
+    hr <- survcomp::hazard.ratio(as.numeric(clin_factors[idx, i]), rfs[idx, 1], rfs[idx, 2])
+    c(HR=hr$hazard.ratio, CI95lo=hr$lower, CI95hi=hr$upper, P=hr$p.value)
+  })
+  colnames(res_single) <- colnames(clin_factors)
+  res_single <- t(res_single)
+
+  ind <- which(res_single[, 4] < 0.05)
+
+  icpi_model <- survival::coxph(rfs ~ ., data=clin_factors[, ind])
+  res_mul <- data.frame(summary(icpi_model)$conf.int[, -2], summary(icpi_model)$coefficients[, 5])
+  colnames(res_mul) <- colnames(res_single)
+  rownames(res_mul) <- rownames(res_single)[ind]
+
+  res <- t(dplyr::full_join(as.data.frame(t(res_single)),
+                            as.data.frame(t(res_mul))))
+
+  colnames(res) <- rep(colnames(res_single), 2)
+  res
+}
