@@ -13,3 +13,10 @@ init_R <- function() {
 
   devtools::install_github("renozao/NMF")
 }
+
+#' @export
+#'
+update_all <- function() {
+  devtools::install_github("gaofeng21cn/gaofenglib")
+  devtools::install_github("gaofeng21cn/gfplot")
+}
