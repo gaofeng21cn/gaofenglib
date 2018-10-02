@@ -41,7 +41,7 @@ calc_cutoff_survivalroc <- function(rfs, rs, limit = 60) {
 #' @export
 #' @import survcomp survival
 #'
-factor_analysis <- function(clin_factors, rfs, limit = NULL, string=F) {
+factor_analysis <- function(clin_factors, rfs, limit = NULL, string=F, ignore.mul.auto=T) {
 
   time <- rfs[, 1]
   event <- rfs[, 2] == 1
@@ -70,9 +70,16 @@ factor_analysis <- function(clin_factors, rfs, limit = NULL, string=F) {
   }
 
   if(length(ind) < 2) {
-    # res_mul <- t(data.frame(res_single[ind, ]))
-    # rownames(res_mul) <- rownames(res_single)[ind]
-    res <- res_single
+    if(ignore.mul.auto) {
+      res <- res_single
+    } else {
+      res_mul <- res_single
+      res_mul[-ind, ] <- NA
+      res <- t(dplyr::full_join(as.data.frame(t(res_single)),
+                                as.data.frame(t(res_mul))))
+      colnames(res) <- rep(colnames(res_single), 2)
+    }
+
   } else {
     icpi_model <- survival::coxph(rfs ~ ., data=(clin_factors[, ind]))
     res_mul <- cbind(summary(icpi_model)$conf.int[, -2], summary(icpi_model)$coefficients[, 5])
