@@ -16,7 +16,8 @@ init_R <- function() {
 
 #' @export
 #'
-update_all <- function() {
+update_all <- function(auth_token == NULL) {
   devtools::install_github("gaofeng21cn/gaofenglib")
   devtools::install_github("gaofeng21cn/gfplot")
+  devtools::install_github("gaofeng21cn/curatedClinicalData", auth_token = auth_token)
 }

@@ -54,7 +54,8 @@ factor_analysis <- function(clin_factors, rfs, limit = NULL, string=F) {
 
   res_single <- sapply(1:ncol(clin_factors), function(i) {
     idx <- !is.na(clin_factors[, i]) & !is.na(rfs)
-    hr <- survcomp::hazard.ratio(as.numeric(clin_factors[idx, i]), rfs[idx, 1], rfs[idx, 2])
+    hr <- tryCatch(survcomp::hazard.ratio(as.numeric(clin_factors[idx, i]), rfs[idx, 1], rfs[idx, 2]),
+                   error= function(e) {return(NULL)})
     c(HR=hr$hazard.ratio, CI95lo=hr$lower, CI95hi=hr$upper, P=hr$p.value)
   })
   colnames(res_single) <- colnames(clin_factors)
@@ -91,7 +92,6 @@ factor_analysis <- function(clin_factors, rfs, limit = NULL, string=F) {
     colnames(res) <- rep(colnames(res_single), 2)
   }
 
-
-  res
+  data.frame(res)
 
 }
