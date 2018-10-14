@@ -38,6 +38,58 @@ calc_logit <- function (value, label, string = F)
 }
 
 #' @export
+factor_analysis_logit <- function(clin_factors, label, string = F) {
+  calc_or <- function(value, label) {
+    roc2 <- pROC::roc(label, value)
+    cutoff <- pROC::coords(roc2, "best", ret = "threshold", best.policy = "omit")
+    YhatFac <- cut(value, breaks = c(-Inf, cutoff, Inf), labels = c("lo",
+                                                                    "hi"))
+    odds <- vcd::oddsratio(table(label, YhatFac), log = F)
+    or <- c(exp(odds$coefficients), confint(odds)[1], confint(odds)[2])
+    as.numeric(or)
+  }
+
+  res_single <- sapply(1:ncol(clin_factors), function(i) {
+    value <- clin_factors[, i]
+    or <- tryCatch({
+      calc_or(value, label)
+    }, error = function(e) {
+      return(NULL)
+    })
+    mylogit <- glm(label ~ value, family = binomial)
+    p <- coef(summary(mylogit))[2, 4]
+
+    c(OR = or[1], CI95lo = or[2], CI95hi = or[3], P = p)
+  })
+
+  colnames(res_single) <- colnames(clin_factors)
+  res_single <- t(res_single)
+  ind <- which(res_single[, "P"] < 0.05)
+  if (string) {
+    res_single <- data.frame(OR = sprintf("%3.2f (%3.2f - %3.2f)",
+                                          res_single[, 1], res_single[, 2], res_single[, 3]), P = signif(res_single[,
+                                                                                                                    4], 2))
+  }
+
+  mylogit <- glm(label ~ ., family = binomial, data = clin_factors)
+  lreg.or <- exp(cbind(OR = coef(mylogit), confint(mylogit)))
+  p <- coef(summary(mylogit))[, 4]
+  res_mul <- cbind(lreg.or, p)[-1, ]
+
+
+
+  if (string) {
+    res_mul <- data.frame(OR = sprintf("%3.2f (%3.2f - %3.2f)", res_mul[,
+                                                                        1], res_mul[, 2], res_mul[, 3]), P = signif(res_mul[, 4], 2))
+  } else {
+    colnames(res_mul) <- colnames(res_single)
+  }
+
+  res <- data.frame(res_single, res_mul)
+  res
+}
+
+#' @export
 #' @import survivalROC
 
 calc_cutoff_survivalroc <- function(rfs, rs, limit = 60) {
@@ -50,7 +102,7 @@ calc_cutoff_survivalroc <- function(rfs, rs, limit = 60) {
 #' @export
 #' @import survcomp survival
 #'
-factor_analysis <- function(clin_factors, rfs, limit = NULL, string=F, ignore.mul.auto=T) {
+factor_analysis_cox <- function(clin_factors, rfs, limit = NULL, string=F, ignore.mul.auto=T) {
 
   time <- rfs[, 1]
   event <- rfs[, 2] == 1
