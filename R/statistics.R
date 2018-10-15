@@ -1,165 +1,65 @@
 #' @export
 #' @import pROC
-calc_logit <- function (value, label, string = F)
-{
-  set.seed(100)
-  roc2 <- pROC::roc(label, value)
-  power.roc <- c(power.roc.test(roc2, alternative = "one.side")$power,
-                 NA, NA)
-  auc <- pROC::ci(roc2)[c(2, 1, 3)]
-  names(auc) <- c("auc", "95% ci(lo)", "95% ci(hi)")
-  rets <- c("threshold", "specificity", "sensitivity", "accuracy",
-            "tn", "tp", "fn", "fp", "npv", "ppv", "1-specificity",
-            "1-sensitivity", "1-accuracy", "1-npv", "1-ppv")
-  others <- pROC::coords(roc2, "best", ret = rets, best.policy = "omit")
-  YhatFac <- cut(value, breaks = c(-Inf, others["threshold"],
-                                   Inf), labels = c("lo", "hi"))
-  odds <- vcd::oddsratio(table(label, YhatFac), log = F)
-  or <- c(exp(odds$coefficients), confint(odds)[1], confint(odds)[2])
-  df <- data.frame(ci.coords(roc2, x = "best", input = "threshold",
-                             ret = rets, progress = "none", best.policy = "omit",
-                             parallel = TRUE))
-  df <- rbind(auc = auc, power = power.roc, or = or, data.frame(others,
-                                                                df[, -2]))
-  colnames(df) <- c("best", "95% ci(lo)", "95% ci(hi)")
-  if(string) {
-    tmp <- sprintf("%3.2f (%3.2f - %3.2f)", df[, 1], df[, 2], df[, 3])
-    names(tmp) <- rownames(df)
-    tmp[2] <- sprintf("%3.2f", df["power", "best"])
-    tmp[8:11] <- sprintf("%d (%d - %d)", as.integer(df[, 1]), as.integer(df[, 2]), as.integer(df[, 3]))[8:11]
-    df <- tmp
-    names(df) <- c("AUC", "Power", "Odds Ratio", "Threshold",
-                   "Specificity", "Sensitivity", "Accuracy",
-                   "TN", "TP", "FN", "FP", "NPV", "PPV", "1-Specificity",
-                   "1-Sensitivity", "1-Accuracy", "1-NPV", "1-PPV")
-  }
-
-  df
-}
-
-#' @export
-factor_analysis_logit <- function(clin_factors, label, string = F) {
-  calc_or <- function(value, label) {
+calc_logit <- function(value, label, string = F) {
+    set.seed(100)
     roc2 <- pROC::roc(label, value)
-    cutoff <- pROC::coords(roc2, "best", ret = "threshold", best.policy = "omit")
-    YhatFac <- cut(value, breaks = c(-Inf, cutoff, Inf), labels = c("lo",
-                                                                    "hi"))
+    power.roc <- c(power.roc.test(roc2, alternative = "one.side")$power, 
+        NA, NA)
+    auc <- pROC::ci(roc2)[c(2, 1, 3)]
+    names(auc) <- c("auc", "95% ci(lo)", "95% ci(hi)")
+    rets <- c("threshold", "specificity", "sensitivity", "accuracy", 
+        "tn", "tp", "fn", "fp", "npv", "ppv", "1-specificity", "1-sensitivity", 
+        "1-accuracy", "1-npv", "1-ppv")
+    others <- pROC::coords(roc2, "best", ret = rets, best.policy = "omit")
+    YhatFac <- cut(value, breaks = c(-Inf, others["threshold"], Inf), 
+        labels = c("lo", "hi"))
     odds <- vcd::oddsratio(table(label, YhatFac), log = F)
     or <- c(exp(odds$coefficients), confint(odds)[1], confint(odds)[2])
-    as.numeric(or)
-  }
-
-  res_single <- sapply(1:ncol(clin_factors), function(i) {
-    value <- clin_factors[, i]
-    or <- tryCatch({
-      calc_or(value, label)
-    }, error = function(e) {
-      return(NULL)
-    })
-    mylogit <- glm(label ~ value, family = binomial)
-    p <- coef(summary(mylogit))[2, 4]
-
-    c(OR = or[1], CI95lo = or[2], CI95hi = or[3], P = p)
-  })
-
-  colnames(res_single) <- colnames(clin_factors)
-  res_single <- t(res_single)
-  ind <- which(res_single[, "P"] < 0.05)
-  if (string) {
-    res_single <- data.frame(OR = sprintf("%3.2f (%3.2f - %3.2f)",
-                                          res_single[, 1], res_single[, 2], res_single[, 3]), P = signif(res_single[,
-                                                                                                                    4], 2))
-  }
-
-  mylogit <- glm(label ~ ., family = binomial, data = clin_factors)
-  lreg.or <- exp(cbind(OR = coef(mylogit), confint(mylogit)))
-  p <- coef(summary(mylogit))[, 4]
-  res_mul <- cbind(lreg.or, p)[-1, ]
-
-
-
-  if (string) {
-    res_mul <- data.frame(OR = sprintf("%3.2f (%3.2f - %3.2f)", res_mul[,
-                                                                        1], res_mul[, 2], res_mul[, 3]), P = signif(res_mul[, 4], 2))
-  } else {
-    colnames(res_mul) <- colnames(res_single)
-  }
-
-  res <- data.frame(res_single, res_mul)
-  res
+    df <- data.frame(ci.coords(roc2, x = "best", input = "threshold", 
+        ret = rets, progress = "none", best.policy = "omit", parallel = TRUE))
+    df <- rbind(auc = auc, power = power.roc, or = or, data.frame(others, 
+        df[, -2]))
+    colnames(df) <- c("best", "95% ci(lo)", "95% ci(hi)")
+    if (string) {
+        tmp <- sprintf("%3.2f (%3.2f - %3.2f)", df[, 1], df[, 2], df[, 
+            3])
+        names(tmp) <- rownames(df)
+        tmp[2] <- sprintf("%3.2f", df["power", "best"])
+        tmp[8:11] <- sprintf("%d (%d - %d)", as.integer(df[, 1]), as.integer(df[, 
+            2]), as.integer(df[, 3]))[8:11]
+        df <- tmp
+        names(df) <- c("AUC", "Power", "Odds Ratio", "Threshold", "Specificity", 
+            "Sensitivity", "Accuracy", "TN", "TP", "FN", "FP", "NPV", 
+            "PPV", "1-Specificity", "1-Sensitivity", "1-Accuracy", "1-NPV", 
+            "1-PPV")
+    }
+    
+    df
 }
+
+
 
 #' @export
 #' @import survivalROC
 
 calc_cutoff_survivalroc <- function(rfs, rs, limit = 60) {
-  p <- survivalROC::survivalROC(Stime = rfs[, 1], status = rfs[, 2], marker = rs, predict.time = limit, method="KM")
-  idx <- with(p, which.min(1-TP+ FP))
-  rs_cut <- p$cut.values[idx]
-  rs_cut
+    p <- survivalROC::survivalROC(Stime = rfs[, 1], status = rfs[, 2], 
+        marker = rs, predict.time = limit, method = "KM")
+    idx <- with(p, which.min(1 - TP + FP))
+    rs_cut <- p$cut.values[idx]
+    rs_cut
 }
 
 #' @export
-#' @import survcomp survival
-#'
-factor_analysis_cox <- function(clin_factors, rfs, limit = NULL, string=F, ignore.mul.auto=T) {
+#' @import pROC
 
-  time <- rfs[, 1]
-  event <- rfs[, 2] == 1
-  if (!is.null(limit)) {
-    event[time > limit] <- F
-    time[time > limit] <- limit
-  }
-  rfs <- survival::Surv(time, event)
-
-
-  res_single <- sapply(1:ncol(clin_factors), function(i) {
-    idx <- !is.na(clin_factors[, i]) & !is.na(rfs)
-    hr <- tryCatch(survcomp::hazard.ratio(as.numeric(clin_factors[idx, i]), rfs[idx, 1], rfs[idx, 2]),
-                   error= function(e) {return(NULL)})
-    c(HR=hr$hazard.ratio, CI95lo=hr$lower, CI95hi=hr$upper, P=hr$p.value)
-  })
-  colnames(res_single) <- colnames(clin_factors)
-  res_single <- t(res_single)
-
-  ind <- which(res_single[, "P"] < 0.05)
-
-  if(string) {
-    res_single <- data.frame(HR=sprintf("%3.2f (%3.2f - %3.2f)",
-                                        res_single[, 1], res_single[, 2], res_single[, 3]),
-                             P=signif(res_single[, 4], 2))
-  }
-
-  if(length(ind) < 2) {
-    if(ignore.mul.auto) {
-      res <- res_single
-    } else {
-      res_mul <- res_single
-      res_mul[-ind, ] <- NA
-      res <- t(dplyr::full_join(as.data.frame(t(res_single)),
-                                as.data.frame(t(res_mul))))
-      colnames(res) <- rep(colnames(res_single), 2)
-    }
-
-  } else {
-    icpi_model <- survival::coxph(rfs ~ ., data=(clin_factors[, ind]))
-    res_mul <- cbind(summary(icpi_model)$conf.int[, -2], summary(icpi_model)$coefficients[, 5])
-
-    rownames(res_mul) <- rownames(res_single)[ind]
-
-    if(string) {
-      res_mul <- data.frame(HR=sprintf("%3.2f (%3.2f - %3.2f)",
-                                       res_mul[, 1], res_mul[, 2], res_mul[, 3]),
-                            P=signif(res_mul[, 4], 2))
-    } else {
-      colnames(res_mul) <- colnames(res_single)
-    }
-
-    res <- t(dplyr::full_join(as.data.frame(t(res_single)),
-                              as.data.frame(t(res_mul))))
-    colnames(res) <- rep(colnames(res_single), 2)
-  }
-
-  data.frame(res)
-
+calc_or <- function(value, label) {
+    roc2 <- pROC::roc(label, value)
+    cutoff <- pROC::coords(roc2, "best", ret = "threshold", best.policy = "omit")
+    YhatFac <- cut(value, breaks = c(-Inf, cutoff, Inf), labels = c("lo", 
+        "hi"))
+    odds <- vcd::oddsratio(table(label, YhatFac), log = F)
+    or <- c(exp(odds$coefficients), confint(odds)[1], confint(odds)[2])
+    as.numeric(or)
 }
+

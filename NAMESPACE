@@ -3,6 +3,7 @@
 export(calc_cutoff_survivalroc)
 export(calc_logit)
 export(calc_oncotypedx_crc)
+export(calc_or)
 export(clean_dat)
 export(eval_logit)
 export(extract_tcga_clinical)
