@@ -60,6 +60,7 @@ calc_oncotypedx_crc <- function(dat) {
 
 
 #' @export
+#' @import foreach
 calc_resamp_cox <- function(data, rfs, resamp.ratio = 0.8, resamp.time = 1000, cores = 40, verbose=F) {
   doParallel::registerDoParallel(cores)
   set.seed(100)
