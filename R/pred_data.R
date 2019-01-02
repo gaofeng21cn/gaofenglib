@@ -60,12 +60,13 @@ calc_oncotypedx_crc <- function(dat) {
 
 
 #' @export
-calc_resamp_cox <- function(data, rfs, resamp.ratio = 0.8, resamp.time = 1000, cores = 40) {
+calc_resamp_cox <- function(data, rfs, resamp.ratio = 0.8, resamp.time = 1000, cores = 40, verbose=F) {
   doParallel::registerDoParallel(cores)
   set.seed(100)
 
   foreach(i = 1:resamp.time, .combine=cbind) %dopar% {
     ind <- sample(nrow(data), nrow(data) * resamp.ratio)
+    if(verbose) cat(paste("Resampling:", i))
     apply(data, 2, function(gene) tryCatch({summary(survival::coxph(rfs[ind, ] ~ gene[ind]))$coefficients[5]},
                                            error= function(e) {return(NA)}))
   }
