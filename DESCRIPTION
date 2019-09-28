@@ -10,5 +10,5 @@ Encoding: UTF-8
 LazyData: true
 Imports: ggplot2, ggsci, ggfortify, pROC, survivalROC
 Depends:
-    cowplot, scales, dplyr
-RoxygenNote: 6.1.0
+    cowplot, scales, dplyr, foreach
+RoxygenNote: 6.1.1
