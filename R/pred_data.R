@@ -20,10 +20,7 @@ clean_dat <- function(gene.exp, keytype = "ENTREZID", column = "SYMBOL") {
   i <- tapply(m, colnames(gene.exp), which.max)
   ind <- tapply(1:ncol(gene.exp), colnames(gene.exp), function(x) x)
   gene.exp[, mapply(function(a, b) a[b], ind, i)]
-<<<<<<< HEAD
-=======
 
->>>>>>> a2b9b99f2f8923fe4e3485131017837709f4b9bf
 }
 
 #' @export
