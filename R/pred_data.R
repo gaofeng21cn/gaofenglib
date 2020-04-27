@@ -20,6 +20,10 @@ clean_dat <- function(gene.exp, keytype = "ENTREZID", column = "SYMBOL") {
   i <- tapply(m, colnames(gene.exp), which.max)
   ind <- tapply(1:ncol(gene.exp), colnames(gene.exp), function(x) x)
   gene.exp[, mapply(function(a, b) a[b], ind, i)]
+<<<<<<< HEAD
+=======
+
+>>>>>>> a2b9b99f2f8923fe4e3485131017837709f4b9bf
 }
 
 #' @export
@@ -53,4 +57,19 @@ calc_oncotypedx_crc <- function(dat) {
         corrected_individual = corrected_individual, RS_score = RS_score,
         oncotypeDX_score = oncotypeDX_score, oncotypeDX_class = oncotypeDX_class)
     DX
+}
+
+
+#' @export
+#' @import foreach
+calc_resamp_cox <- function(data, rfs, resamp.ratio = 0.8, resamp.time = 1000, cores = 40, verbose=F) {
+  doParallel::registerDoParallel(cores)
+  set.seed(100)
+
+  foreach(i = 1:resamp.time, .combine=cbind) %dopar% {
+    ind <- sample(nrow(data), nrow(data) * resamp.ratio)
+    if(verbose) cat(paste("Resampling:", i))
+    apply(data, 2, function(gene) tryCatch({summary(survival::coxph(rfs[ind, ] ~ gene[ind]))$coefficients[5]},
+                                           error= function(e) {return(NA)}))
+  }
 }
